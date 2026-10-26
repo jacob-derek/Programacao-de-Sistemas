@@ -44,8 +44,8 @@ def CriarAluno():
         conexao.commit()
         print("Aluno adicionado.")
     except sqlite3.Error as error:
-        conexao.rollback(f"{error}")
-        print("")
+        conexao.rollback()
+        print(f"Erro: {error}")
 
 
 def ExcluirAluno():
@@ -58,14 +58,17 @@ def ExcluirAluno():
 
 # listar alunos usando fetchall()
 def ListarAlunos():
-    cursor.execute("SELECT * FROM alunos")
-    alunos = cursor.fetchall()
-
-    if alunos != 0:
-        for aluno in alunos:
-            print(aluno)
-    else:
-        print("Nenhum aluno registrado.")
+    try:
+        cursor.execute("SELECT * FROM alunos")
+        alunos = cursor.fetchall()
+    
+        if alunos:
+            for aluno in alunos:
+                print(f"{aluno}")
+        else:
+            print("Sem alunos no banco.")
+    except sqlite3.Error as error:
+        printf(f"Erro: {error}")
 
 
 acoes = {
@@ -87,11 +90,11 @@ while True:
     ).run()
 
     if opcao is None or opcao == "Sair":
-        pass
+        break
 
     acao = acoes.get(opcao)
     if acao:
         acao()
 
-    cursor.close()
-    conexao.close()
+cursor.close()
+conexao.close()
