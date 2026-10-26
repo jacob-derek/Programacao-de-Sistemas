@@ -1,5 +1,5 @@
 import sqlite3
-from prompt_toolkit import radiolist_dialog
+from prompt_toolkit.shortcuts import radiolist_dialog
 
 #tenho que conectar e criar um cursor
 
@@ -34,25 +34,46 @@ def CriarAluno():
     print("Aluno adicionado.")
 
 
+def ExcluirAluno():
+    id_aluno = int(input("ID do aluno: "))
+    cursor.execute("DELETE FROM alunos WHERE ID = ?", (id_aluno,))
+
+    conexao.commit()
+    print("Deletado.")
+
 
 # listar alunos usando fetchall()
 def ListarAlunos():
     cursor.execute("SELECT * FROM alunos")
     alunos = cursor.fetchall()
 
-    for aluno in alunos():
+    for aluno in alunos:
         print(aluno)
 
 
-opcao = radiolist_dialog(
-    title="SQL",
-    text="O que deseja fazer?",
-    values=[
-        ("Adicionar", "Adicionar aluno"),
-        ("Listar", "Listar alunos"),
-        ("Excluir", "Remover aluno"),
-        ("Sair", "Sair"),
-    ],
-).run()
+acoes = {
+    "Adicionar", CriarAluno,
+    "Listar", ListarAlunos, 
+    "Excluir", ExcluirAluno
+}
 
-print("Opcao escolhida: ", opcao)
+while True:
+    opcao = radiolist_dialog(
+        title="SQL",
+        text="O que deseja fazer?",
+        values=[
+            ("Adicionar", "Adicionar aluno"),
+            ("Listar", "Listar alunos"),
+            ("Excluir", "Remover aluno"),
+            ("Sair", "Sair"),
+        ],
+    ).run()
+    
+    if opcao is None or opcao == "Sair":
+        break
+    
+    acao = acoes.get(opcao)
+    if acao:
+        acao()
+
+conexao.close()
