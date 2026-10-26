@@ -7,36 +7,45 @@ conexao = sqlite3.connect("curso.db")
 cursor = conexao.cursor()
 
 #####       criar a tabela         ####
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS alunos (
-    id INTEGER PRIMARY KEY,
-    nome TEXT NOT NULL,
-    idade INTEGER,
-    curso TEXT
-)
-""")
 
-conexao.commit()
+try:
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS alunos (
+        id INTEGER PRIMARY KEY,
+        nome TEXT NOT NULL,
+        idade INTEGER,
+        curso TEXT
+    )
+    """)
+    
+    conexao.commit()
+except sqlite3.Error as error:
+    printf(f"Erro: {error}")
 
 # tenho que criar variaveis que recebem nome, idade e curso e 
 # enfiar isso no sql usando execute(INSERT INTO (blablabla) values (???), (blablabla)
 # tudo dentro de parenteses pq to escrevendo bglh
 
 def CriarAluno():
-    nome = input("Nome: ")
-    idade = int(input("Idade: "))
+    nome = input("Nome: ").strip()
+    if not nome:
+        print("Preencha corretamente.")
+        return
+    try:
+        idade = int(input("Idade: "))
+    except ValueError:
+        print("Preencha corretamente com numeros inteiros.")
+        return
 
-    if isinstance(idade, int):
-        idade = idade
-    else:
-        idade = int(input("Digite idade com numeros: "))
-    curso = input("Curso: ")
-    
-    cursor.execute("INSERT INTO alunos (nome, idade, curso) VALUES (?,?,?)", (nome, idade, curso))
+    curso = input("Curso: ").strip()
 
-    # commit
-    conexao.commit()
-    print("Aluno adicionado.")
+    try:
+        cursor.execute("INSERT INTO alunos (nome, idade, curso) VALUES (?,?,?)", (nome, idade, curso))
+        conexao.commit()
+        print("Aluno adicionado.")
+    except sqlite3.Error as error:
+        conexao.rollback(f"{error}")
+        print("")
 
 
 def ExcluirAluno():
@@ -65,22 +74,24 @@ acoes = {
     "Excluir": ExcluirAluno
 }
 
-opcao = radiolist_dialog(
-    title="SQL",
-    text="O que deseja fazer?",
-    values=[
-        ("Adicionar", "Adicionar aluno"),
-        ("Listar", "Listar alunos"),
-        ("Excluir", "Remover aluno"),
-        ("Sair", "Sair"),
-    ],
-).run()
+while True:
+    opcao = radiolist_dialog(
+        title="SQL",
+        text="O que deseja fazer?",
+        values=[
+            ("Adicionar", "Adicionar aluno"),
+            ("Listar", "Listar alunos"),
+            ("Excluir", "Remover aluno"),
+            ("Sair", "Sair"),
+        ],
+    ).run()
 
-if opcao is None or opcao == "Sair":
-    pass
+    if opcao is None or opcao == "Sair":
+        pass
 
-acao = acoes.get(opcao)
-if acao:
-    acao()
+    acao = acoes.get(opcao)
+    if acao:
+        acao()
 
-conexao.close()
+    cursor.close()
+    conexao.close()
