@@ -25,6 +25,11 @@ conexao.commit()
 def CriarAluno():
     nome = input("Nome: ")
     idade = int(input("Idade: "))
+
+    if isinstance(idade, int):
+        idade = idade
+    else:
+        idade = int(input("Digite idade com numeros: "))
     curso = input("Curso: ")
     
     cursor.execute("INSERT INTO alunos (nome, idade, curso) VALUES (?,?,?)", (nome, idade, curso))
@@ -36,7 +41,7 @@ def CriarAluno():
 
 def ExcluirAluno():
     id_aluno = int(input("ID do aluno: "))
-    cursor.execute("DELETE FROM alunos WHERE ID = ?", (id_aluno,))
+    cursor.execute("DELETE FROM alunos WHERE id = ?", (id_aluno,))
 
     conexao.commit()
     print("Deletado.")
@@ -47,33 +52,35 @@ def ListarAlunos():
     cursor.execute("SELECT * FROM alunos")
     alunos = cursor.fetchall()
 
-    for aluno in alunos:
-        print(aluno)
+    if alunos != 0:
+        for aluno in alunos:
+            print(aluno)
+    else:
+        print("Nenhum aluno registrado.")
 
 
 acoes = {
-    "Adicionar", CriarAluno,
-    "Listar", ListarAlunos, 
-    "Excluir", ExcluirAluno
+    "Adicionar": CriarAluno,
+    "Listar": ListarAlunos, 
+    "Excluir": ExcluirAluno
 }
 
-while True:
-    opcao = radiolist_dialog(
-        title="SQL",
-        text="O que deseja fazer?",
-        values=[
-            ("Adicionar", "Adicionar aluno"),
-            ("Listar", "Listar alunos"),
-            ("Excluir", "Remover aluno"),
-            ("Sair", "Sair"),
-        ],
-    ).run()
-    
-    if opcao is None or opcao == "Sair":
-        break
-    
-    acao = acoes.get(opcao)
-    if acao:
-        acao()
+opcao = radiolist_dialog(
+    title="SQL",
+    text="O que deseja fazer?",
+    values=[
+        ("Adicionar", "Adicionar aluno"),
+        ("Listar", "Listar alunos"),
+        ("Excluir", "Remover aluno"),
+        ("Sair", "Sair"),
+    ],
+).run()
+
+if opcao is None or opcao == "Sair":
+    pass
+
+acao = acoes.get(opcao)
+if acao:
+    acao()
 
 conexao.close()
