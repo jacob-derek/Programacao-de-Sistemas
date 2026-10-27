@@ -89,25 +89,25 @@ try:
     print(cursor.fetchone())
     
     # para deletar, use DELETE
-    # cursor.execute('DELETE FROM Filmes coluna = ? WHERE id = ?', (ITEM DE ACORDO '',))
+    # cursor.execute('DELETE FROM Filmes WHERE id = ?', (ITEM DE ACORDO '',))
     # conn.commit()
     
     print("\n            ADICIONANDO E APAGANDO NOVO FILME:")
-    filme_qualquer = "A Casa de Cera"
     cursor.execute(
         "INSERT INTO Filmes (titulo, ano, genero, duracao_min, nota) VALUES (?,?,?,?,?)", 
-        (filme_qualquer, 2005, "Terror", 113, 5.5)
+        ("A Casa de Cera", 2005, "Terror", 113, 5.5)
     )
-    cursor.commit()
+    conn.commit()
+    id_novo = cursor.lastrowid
     
     print("\n            Mostrando oq adicionei:")
-    cursor.execute('SELECT * FROM Filmes WHERE titulo = ?', (filme_qualquer,))
+    cursor.execute('SELECT * FROM Filmes WHERE id = ?', (id_novo,))
     for filme in cursor.fetchall():
         print(filme)
     
-    print("\n            Apagando esse filme bosta:")
-    cursor.execute('DELETE FROM FILMES WHERE titulo = ?', (filme_qualquer,))
-    cursor.commit()
+    print("\n            Apagando esse filme:")
+    cursor.execute('DELETE FROM FILMES WHERE id = ?', (id_novo,))
+    conn.commit()
     
     print("\n-----------------------------------------------")
     print("\n--- CATALOGO FINAL ---")
