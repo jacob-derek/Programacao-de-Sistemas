@@ -48,7 +48,6 @@ numero_b.pack(pady=5, ipady=5)
 
 frame_botoes = tk.Frame(window, bg=BG_DARK)
 frame_botoes.pack(pady=10)
-btn_sum = tk.Button()
 
 btn_config = {
     "width": 5,
